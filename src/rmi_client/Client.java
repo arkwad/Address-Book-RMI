@@ -107,7 +107,7 @@ public final class Client
 		Message msg = new Message();
 		try
 		{
-			if ( 0 ==  opt.compareToIgnoreCase("by-name"))
+			if ( 0 ==  opt.compareToIgnoreCase("--by-name"))
 			{
 				msg.setNameProp(value);
 				if ( ifc.searchRecordByName(msg))
@@ -120,7 +120,7 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("by-surname"))
+			else if ( 0 ==  opt.compareToIgnoreCase("--by-surname"))
 			{
 				msg.setNameProp(value);
 				if ( ifc.searchRecordBySurname(msg))
@@ -133,7 +133,7 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("by-id"))
+			else if ( 0 ==  opt.compareToIgnoreCase("--by-id"))
 			{
 				msg.setNameProp(value);
 				if ( ifc.searchRecordById(msg))
@@ -146,7 +146,7 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("all")) 
+			else if ( 0 ==  opt.compareToIgnoreCase("--all")) 
 			{
 				msg.setNameProp(value);
 				if ( ifc.getFullList(msg))
