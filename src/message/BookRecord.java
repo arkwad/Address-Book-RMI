@@ -13,6 +13,7 @@ package message;
  */
 public class BookRecord 
 {
+	public String id;
 	public String name;
 	public String surname;
 	public String age;
@@ -33,6 +34,7 @@ public class BookRecord
 	
 	public void resetValues ()
 	{
+		this.id = "";
 		this.name = "";
 		this.surname = "";
 		this.age = "";

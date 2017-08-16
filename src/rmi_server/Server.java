@@ -13,7 +13,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import rmi_interface.Interface;
@@ -69,7 +68,7 @@ public class Server extends UnicastRemoteObject implements Interface
 		/* build absolute path to file we will work with */
 		this.currentPath = this.currentPath.substring(0, this.currentPath.length()-2);
 		this.filePath = Paths.get(this.currentPath, this.fileName);
-		
+
 		this.addressBook = new File(this.filePath.toString());
 
 		if ( !this.checkIfFileExist() )
@@ -87,15 +86,18 @@ public class Server extends UnicastRemoteObject implements Interface
 	}
 
 	public static void main(String[] args) throws Exception, IOException
-    {
+	{
 		Server srv = new Server();
 		Message msg = new Message();
 		BookRecord br = new BookRecord();
-		msg.setRecordId(3);
 		msg.setBookRecord(br);
 		srv.addRecord(msg);
-		srv.removeRecord(msg);
-    }
+		srv.addRecord(msg);
+		srv.addRecord(msg);
+		msg.setSurnameProp("Wadowski");
+		srv.searchRecordBySurname(msg);
+
+	}
 	/**
 	 * \brief Check if file with data exist in working directory.
 	 *
@@ -114,37 +116,38 @@ public class Server extends UnicastRemoteObject implements Interface
 	{
 		try 
 		{
-			this.fileWritter.write("");
+			Files.write(filePath, "".getBytes());
+			return true;
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
+			return false;
 		}
-		return null;
 	}
 
 	@Override
 	public Boolean addRecord(Message msg) throws RemoteException 
 	{
 		BookRecord record = msg.getBookRecord();
-		
+
 		String rawStr = this.utils.convertStructToString(record);
 		try 
 		{
 			List<String> lines = Files.readAllLines(this.filePath);
 			if ( lines.isEmpty() )
 			{
-				this.fileWritter.write("1: " + rawStr);
+				String str = "Id: 1," + rawStr;
+				Files.write(filePath, str.getBytes(), StandardOpenOption.APPEND);
 				return true;
 			}
 			else
 			{
 				String lastRecord = lines.get(lines.size() - 1);
-				Integer maxIndex = Integer.decode(lastRecord.substring(0, lastRecord.indexOf(":",0)));
+				Integer maxIndex = Integer.decode(lastRecord.substring(4, lastRecord.indexOf(",",0)));
 				maxIndex++;
-				String toWrite = "\n" + maxIndex.toString()+": " + rawStr;
+				String toWrite = "Id: " + maxIndex.toString()+"," + rawStr;
 				Files.write(filePath, toWrite.getBytes(), StandardOpenOption.APPEND);
-				//this.fileWritter.append();
 				return true;
 			}
 		} 
@@ -194,35 +197,135 @@ public class Server extends UnicastRemoteObject implements Interface
 	@Override
 	public Boolean editRecord(Message msg) throws RemoteException 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try 
+		{
+			List<String> lines = Files.readAllLines(this.filePath);
+			if ( (msg.getRecordId() >= 1)&&(msg.getRecordId() <= lines.size()))
+			{
+				String line = this.utils.convertStructToString( msg.getBookRecord() );
+				String str = "Id: " + msg.getRecordId().toString() + "," + line;
+				lines.set(msg.getRecordId() - 1, str);
+				Files.write(filePath, lines);
+				return true;
+			}
+			else
+			{
+				return false;
+			}	
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public Boolean getFullList(Message msg) throws RemoteException 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try 
+		{
+			List<String> lines = Files.readAllLines(this.filePath);
+
+			List< BookRecord > tmpList = new ArrayList<BookRecord>();
+
+			for( String line : lines )
+			{
+				if ( !tmpList.add( this.utils.convertStringToStruct(line) ))
+				{
+					msg = null;
+					return false;
+				}
+			}
+			msg.setListOfRecords(tmpList);
+			return true;
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public Boolean searchRecordById(Message msg) throws RemoteException 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Integer indexToSearch = msg.getRecordId();
+		try 
+		{
+			List<String> lines = Files.readAllLines(this.filePath);
+			indexToSearch--;
+			msg.setBookRecord(this.utils.convertStringToStruct(lines.get(indexToSearch)));
+			return true;
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public Boolean searchRecordByName(Message msg) throws RemoteException 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List< BookRecord > listOfFoundRecords = new ArrayList<BookRecord>(); 
+		BookRecord tempRecord = new BookRecord();
+		try 
+		{
+			List<String> lines = Files.readAllLines(this.filePath);
+
+			for (String line : lines )
+			{
+				tempRecord = this.utils.convertStringToStruct(line);
+
+				if ( 0 == msg.getNameProp().compareTo(tempRecord.name) ) 
+				{
+					listOfFoundRecords.add(tempRecord);
+				}
+			}
+			if ( !listOfFoundRecords.isEmpty() )
+			{
+				msg.setListOfRecords( listOfFoundRecords );
+				return true;
+			}
+			return false;
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public Boolean searchRecordBySurname(Message msg) throws RemoteException 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List< BookRecord > listOfFoundRecords = new ArrayList<BookRecord>(); 
+		BookRecord tempRecord = new BookRecord();
+		try 
+		{
+			List<String> lines = Files.readAllLines(this.filePath);
+
+			for (String line : lines )
+			{
+				tempRecord = this.utils.convertStringToStruct(line);
+
+				if ( 0 == msg.getSurnameProp().compareTo(tempRecord.surname) ) 
+				{
+					listOfFoundRecords.add(tempRecord);
+				}
+			}
+			if ( !listOfFoundRecords.isEmpty() )
+			{
+				msg.setListOfRecords( listOfFoundRecords );
+				return true;
+			}
+			return false;
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

@@ -14,7 +14,8 @@ import message.BookRecord;
  */
 public class Utils 
 {
-	List<String> listOfProperties = Arrays.asList("Name: ",
+	List<String> listOfProperties = Arrays.asList("Id: ",
+												  "Name: ",
 												  "Surname: ",
 												  "Age: ",
 												  "Street: ",
@@ -40,7 +41,31 @@ public class Utils
 	{
 		String temp = "Name: " + record.name + ","
 					 +"Surname: " + record.surname + ","
-					 +"Age: " + record.age 
+					 +"Age: " + record.age + ","
+					 +"Street: " + record.street + ","
+					 +"Building Number: " + record.buildingNumber + ","
+					 +"Flat Number: " + record.flatNumber + ","
+					 +"City: " + record.city + ","
+					 +"Post Code: " + record.postCode + ","
+					 +"Phone Number: " + record.phoneNumber + ",.\n";
+		
+		return temp;
+	}
+	/**
+	 * @brief Conversion from structure to raw String.
+	 *
+	 * @param[in] - BookRecord record - structure to be converted.
+	 *
+	 * @retval String - raw data ready to write to file.
+	 * 
+	 * @note function created for pretty print purposes :)
+	 */
+	public String convertStructToStringV2( BookRecord record )
+	{
+		String temp = "Id: " + record.id + ","
+					 +"Name: " + record.name + ","
+					 +"Surname: " + record.surname + ","
+					 +"Age: " + record.age + ","
 					 +"Street: " + record.street + ","
 					 +"Building Number: " + record.buildingNumber + ","
 					 +"Flat Number: " + record.flatNumber + ","
@@ -67,7 +92,11 @@ public class Utils
 			int end = string.indexOf(",", pos);
 			String buff = string.substring(pos, end);
 			
-			if( 0 == property.compareTo("Name: ") )
+			if( 0 == property.compareTo("Id: ") )
+			{
+				temp.id = buff;
+			}
+			else if( 0 == property.compareTo("Name: ") )
 			{
 				temp.name = buff;
 			}
