@@ -16,8 +16,6 @@ import java.util.List;
 import message.BookRecord;
 import message.Message;
 import rmi_interface.Interface;
-import rmi_server.Server;
-import sun.awt.SunHints.Value;
 import utils.Utils;
 
 public final class Client 
@@ -55,7 +53,7 @@ public final class Client
 		}
 	}
 
-	public Boolean addEntry(List< String > values)
+	public Boolean addEntry(List< String > values) throws RemoteException
 	{
 		Message msg = new Message();
 		BookRecord bookRec = new BookRecord();
@@ -86,7 +84,7 @@ public final class Client
 		}
 		return false;
 	}
-	public Boolean removeEntry(Integer idx )
+	public Boolean removeEntry(Integer idx ) throws RemoteException
 	{
 		Message msg = new Message();
 		msg.setRecordId(idx);
@@ -102,12 +100,12 @@ public final class Client
 		}
 	}
 
-	public Boolean getSpecifiedList( String opt, String value, List<String> listOut )
+	public Boolean getSpecifiedList( String opt, String value, List<String> listOut ) throws RemoteException
 	{
 		Message msg = new Message();
 		try
 		{
-			if ( 0 ==  opt.compareToIgnoreCase("--by-name"))
+			if ( opt.equals("--by-name"))
 			{
 				msg.setNameProp(value);
 				if ( ifc.searchRecordByName(msg))
@@ -120,9 +118,9 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("--by-surname"))
+			else if ( opt.equals("--by-surname") )
 			{
-				msg.setNameProp(value);
+				msg.setSurnameProp(value);
 				if ( ifc.searchRecordBySurname(msg))
 				{
 					for ( BookRecord br : msg.getListOfRecords() )
@@ -133,9 +131,9 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("--by-id"))
+			else if ( opt.equals("--by-id") )
 			{
-				msg.setNameProp(value);
+				msg.setRecordId(Integer.decode( value ));
 				if ( ifc.searchRecordById(msg))
 				{
 					for ( BookRecord br : msg.getListOfRecords() )
@@ -146,9 +144,8 @@ public final class Client
 				}
 				return false;
 			}
-			else if ( 0 ==  opt.compareToIgnoreCase("--all")) 
+			else if ( opt.equals("--all") ) 
 			{
-				msg.setNameProp(value);
 				if ( ifc.getFullList(msg))
 				{
 					for ( BookRecord br : msg.getListOfRecords() )
@@ -172,7 +169,7 @@ public final class Client
 		}
 	}
 	
-	public Boolean editEntry( List< String > values )
+	public Boolean editEntry( List< String > values ) throws RemoteException
 	{
 		Message msg = new Message();
 		BookRecord bookRec = new BookRecord();

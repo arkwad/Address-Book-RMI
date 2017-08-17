@@ -1,14 +1,23 @@
 package message;
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-
 /**
  * @author Arek
  *
  */
 import message.BookRecord;
 
-public class Message 
+public class Message implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8756121687865588372L;
+	/**
+	 * 
+	 */
 	private String name;
 	private String surname;
 	private BookRecord bookRecord;
@@ -19,8 +28,10 @@ public class Message
 	 * @brief Constructor
 	 *
 	 */
-	public Message() 
+	public Message() throws RemoteException 
 	{
+		this.bookRecord = new BookRecord();
+		//this.listOfRecords = new List<BookRecord>();
 	}
 	
 	/* set methods */

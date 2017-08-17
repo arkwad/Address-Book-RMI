@@ -14,16 +14,16 @@ import message.BookRecord;
  */
 public class Utils 
 {
-	List<String> listOfProperties = Arrays.asList("Id: ",
-												  "Name: ",
-												  "Surname: ",
-												  "Age: ",
-												  "Street: ",
-												  "Building Number: ",
-												  "Flat Number: ",
-												  "City: ",
-												  "Post Code: ",
-												  "Phone Number: ");	
+	public List<String> listOfProperties = Arrays.asList("Id: ",
+												  		 "Name: ",
+												  		 "Surname: ",
+												  		 "Age: ",
+												  		 "Street: ",
+												  		 "Building Number: ",
+												  		 "Flat Number: ",
+												  		 "City: ",
+												  		 "Post Code: ",
+												  		 "Phone Number: ");	
 	/**
 	 * @brief Constructor
 	 */

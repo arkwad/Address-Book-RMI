@@ -3,6 +3,8 @@
  */
 package message;
 
+import java.io.Serializable;
+
 /**
  * @author Arek
  *
@@ -11,8 +13,12 @@ package message;
 /** @brief Class that specifies format of an Address Book entry.
  * 			This class is used as a part of Message object. 
  */
-public class BookRecord 
+public class BookRecord implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String id;
 	public String name;
 	public String surname;
@@ -30,8 +36,9 @@ public class BookRecord
 	 */
 	public BookRecord() 
 	{
+		this.resetValues();
 	}
-	
+
 	public void resetValues ()
 	{
 		this.id = "";

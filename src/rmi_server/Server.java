@@ -96,7 +96,6 @@ public class Server extends UnicastRemoteObject implements Interface
 		srv.addRecord(msg);
 		msg.setSurnameProp("Wadowski");
 		srv.searchRecordBySurname(msg);
-
 	}
 	/**
 	 * \brief Check if file with data exist in working directory.

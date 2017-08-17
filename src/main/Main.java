@@ -5,9 +5,12 @@ package main;
 
 import java.io.IOException;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import rmi_client.Client;
 import rmi_server.Server;
+import utils.Utils;
  
 /**
  * @brief Constructor
@@ -17,11 +20,14 @@ public class Main
 {
     // class's attributes
 	static Registry register;
+	@SuppressWarnings("unused")
 	private Server myServer;
 	private Client myClient;
+	private Utils utils;
 	
 	protected Main() throws Exception
 	{
+		this.utils = new Utils();
 		this.myServer = new Server();
 		this.myClient = new Client();
 	}
@@ -32,14 +38,15 @@ public class Main
     	
     	// create application instance
     	Main app = new Main();
-    	//app.get_client().clearAddressBook();
-    	
-    	infinite_loop(app);
+    	// run infinite loop
+    	app.infinite_loop();
     }
     
-    @SuppressWarnings("resource")
-	private static void infinite_loop(Main app) throws IOException
+    @SuppressWarnings({ "resource", "unused" })
+	public void infinite_loop() throws IOException
     {
+    	List <String> argsList = new ArrayList<String>();
+    	
 		System.out.println("Type help to get list of available commands...");
 		
 		Scanner scan = new Scanner(System.in);
@@ -54,20 +61,67 @@ public class Main
 					print_commands();
 					break;
 				}
-				case "send":
+				case "add":
 				{
-					s = scan.next();
-			
+					argsList.clear();
+					for ( String arg : utils.listOfProperties )
+					{
+						if ( !arg.equals( utils.listOfProperties.get(0) ) )
+						{
+							System.out.println("Enter " + arg);
+							argsList.add( scan.next() );	
+						}
+					}
+					if (this.get_client().addEntry(argsList))
+					{
+						System.out.println("Entry added sucessfully!");
+					}
+					else
+					{
+						System.out.println("Error ocured during adding! Entry not added!");
+					}
 					break;
 				}
-				case "list":
+				case "get":
+				{
+					argsList.clear();
+					
+					List<String> outputList = new ArrayList<String>();
+					/* get switch */
+					s = scan.next();
+					if ( s.equals("--all"))
+					{
+						if ( this.get_client().getSpecifiedList(s, "", outputList))
+						{
+							for ( String line : outputList )
+							{
+								System.out.println(line);
+							}
+						}
+						else
+						{
+							System.out.println("An error occured during receiving list of records!");
+						}
+					}
+					String action = scan.next();
+					
+					break;
+				}
+				case "remove":
 				{
 					s = scan.next();
 					String action = scan.next();
 					
 					break;
 				}
-				case "save":
+				case "clear":
+				{
+					s = scan.next();
+					String action = scan.next();
+					
+					break;
+				}
+				case "edit":
 				{
 					s = scan.next();
 					String action = scan.next();
@@ -119,9 +173,34 @@ public class Main
     			+ "\t\t * out> Enter phone number:\n"
     			+ "\t\t * in> 123-456-789\n");
     	
-    	System.out.println("save - commands that saves data to file based on number of record from last printed list\n"
-    			+ "\tArguments: first : Spectrum or TimeHistory, second: number of record in list\n"
-    			+ "\tExample: save Spectrum 2\n");
+    	System.out.println("remove -  command that remove record with given id number.\n"
+    			+ "\tExamples: remove 2 \n");
+    	
+    	System.out.println("edit - command that edit record with given id number.\n"
+    			+ "Values of all fiels of record are required\n"
+    			+ "\tExamples:\n"
+    			+ "\t\t * in> edit 2\n"
+    			+ "\t\t * out> Enter name:\n"
+    			+ "\t\t * in> John\n"
+    			+ "\t\t * out> Enter surname:\n"
+    			+ "\t\t * in> Smith\n"
+    			+ "\t\t * out> Enter age:\n"
+    			+ "\t\t * in> 42\n"
+    			+ "\t\t * out> Enter street:\n"
+    			+ "\t\t * in> Bedford\n"
+    			+ "\t\t * out> Enter building number:\n"
+    			+ "\t\t * in> 24\n"
+    			+ "\t\t * out> Enter flat number:\n"
+    			+ "\t\t * in> 42\n"
+    			+ "\t\t * out> Enter city:\n"
+    			+ "\t\t * in> New York\n"
+    			+ "\t\t * out> Enter post code:\n"
+    			+ "\t\t * in> MK42 0AA\n"
+    			+ "\t\t * out> Enter phone number:\n"
+    			+ "\t\t * in> 123-456-789\n");
+    	
+    	System.out.println("clear - commands that clears Address Book \n"
+    			+ "\tExample: clear\n");
     	
     }
 
