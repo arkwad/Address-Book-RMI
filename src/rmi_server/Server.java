@@ -50,6 +50,8 @@ public class Server extends UnicastRemoteObject implements Interface
 	FileWriter fileWritter;
 	FileReader fileReader;
 	Utils utils;
+	/* response msg */
+	Message respMsg;
 
 	/* auto-generated stuff wtf?*/
 	private static final long serialVersionUID = 1L;
@@ -64,6 +66,7 @@ public class Server extends UnicastRemoteObject implements Interface
 		this.registry = LocateRegistry.createRegistry(1099);
 		this.registry.rebind("Server", this);
 		this.utils = new Utils();
+		this.respMsg = new Message();
 
 		/* build absolute path to file we will work with */
 		this.currentPath = this.currentPath.substring(0, this.currentPath.length()-2);
@@ -236,7 +239,7 @@ public class Server extends UnicastRemoteObject implements Interface
 					return false;
 				}
 			}
-			msg.setListOfRecords(tmpList);
+			this.respMsg.setListOfRecords(tmpList);
 			return true;
 		} 
 		catch (IOException e) 
@@ -254,7 +257,7 @@ public class Server extends UnicastRemoteObject implements Interface
 		{
 			List<String> lines = Files.readAllLines(this.filePath);
 			indexToSearch--;
-			msg.setBookRecord(this.utils.convertStringToStruct(lines.get(indexToSearch)));
+			this.respMsg.setBookRecord(this.utils.convertStringToStruct(lines.get(indexToSearch)));
 			return true;
 		}
 		catch (IOException e) 
@@ -284,7 +287,7 @@ public class Server extends UnicastRemoteObject implements Interface
 			}
 			if ( !listOfFoundRecords.isEmpty() )
 			{
-				msg.setListOfRecords( listOfFoundRecords );
+				this.respMsg.setListOfRecords(listOfFoundRecords);
 				return true;
 			}
 			return false;
@@ -316,7 +319,7 @@ public class Server extends UnicastRemoteObject implements Interface
 			}
 			if ( !listOfFoundRecords.isEmpty() )
 			{
-				msg.setListOfRecords( listOfFoundRecords );
+				this.respMsg.setListOfRecords(listOfFoundRecords);
 				return true;
 			}
 			return false;
@@ -326,5 +329,11 @@ public class Server extends UnicastRemoteObject implements Interface
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public Message getResponse() throws RemoteException 
+	{
+		return this.respMsg;
 	}
 }

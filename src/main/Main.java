@@ -3,59 +3,69 @@
  */
 package main;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 import rmi_client.Client;
 import rmi_server.Server;
 import utils.Utils;
- 
+
 /**
  * @brief Constructor
  *
  */
 public class Main 
 {
-    // class's attributes
+	// class's attributes
 	static Registry register;
 	@SuppressWarnings("unused")
 	private Server myServer;
 	private Client myClient;
 	private Utils utils;
-	
+
 	protected Main() throws Exception
 	{
 		this.utils = new Utils();
 		this.myServer = new Server();
 		this.myClient = new Client();
 	}
-	
-    public static void main(String[] args) throws Exception, IOException
-    {
-    	System.out.println("Application started...");
-    	
-    	// create application instance
-    	Main app = new Main();
-    	// run infinite loop
-    	app.infinite_loop();
-    }
-    
-    @SuppressWarnings({ "resource", "unused" })
+
+	public static void main(String[] args) throws Exception, IOException
+	{
+		System.out.println("Application started...");
+
+		// create application instance
+		Main app = new Main();
+		// run infinite loop
+		app.infinite_loop();
+	}
+
+	@SuppressWarnings({ "resource", "unused" })
 	public void infinite_loop() throws IOException
-    {
-    	List <String> argsList = new ArrayList<String>();
-    	
+	{
+		List <String> argsList = new ArrayList<String>();
+
 		System.out.println("Type help to get list of available commands...");
-		
+
 		Scanner scan = new Scanner(System.in);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
 		while(true)
 		{
-			String s = scan.next();
-		
-			switch (s.toLowerCase())
+			argsList.clear();
+
+			String name = reader.readLine();
+			//argsList.add(scan.next());
+			String[] args = name.split(" ");
+			if (args.length > 1)
 			{
+				switch ( args[0] )
+				{
 				case "help":
 				{
 					print_commands();
@@ -72,6 +82,7 @@ public class Main
 							argsList.add( scan.next() );	
 						}
 					}
+
 					if (this.get_client().addEntry(argsList))
 					{
 						System.out.println("Entry added sucessfully!");
@@ -85,47 +96,118 @@ public class Main
 				case "get":
 				{
 					argsList.clear();
-					
+
 					List<String> outputList = new ArrayList<String>();
 					/* get switch */
-					s = scan.next();
-					if ( s.equals("--all"))
+					if ( args.length > 1 )
 					{
-						if ( this.get_client().getSpecifiedList(s, "", outputList))
+
+						if ( args[1].equals("--all"))
 						{
-							for ( String line : outputList )
+							if ( this.get_client().getSpecifiedList( args[1], "", outputList))
 							{
-								System.out.println(line);
+								for ( String line : outputList )
+								{
+									System.out.print(line);
+								}
+							}
+							else
+							{
+								System.out.println("An error occured during receiving list of records!");
 							}
 						}
-						else
+						else 
 						{
-							System.out.println("An error occured during receiving list of records!");
+							if ( 3 == args.length )
+							{
+								switch ( args[1] )
+								{
+								case "--by-id":
+								{
+									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
+									{
+										for ( String line : outputList )
+										{
+											System.out.print(line);
+										}
+									}
+									else
+									{
+										System.out.println("An error occured during receiving list of records!");
+									}
+									break;
+
+								}
+								case "--by-name":
+								{
+									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
+									{
+										for ( String line : outputList )
+										{
+											System.out.print(line);
+										}
+									}
+									else
+									{
+										System.out.println("An error occured during receiving list of records!");
+									}
+									break;
+								}
+								case "--by-surname":
+								{
+									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
+									{
+										for ( String line : outputList )
+										{
+											System.out.print(line);
+										}
+									}
+									else
+									{
+										System.out.println("An error occured during receiving list of records!");
+									}
+									break;
+
+								}
+								default:
+								{
+									System.out.println("Wrong using of get command!");
+									break;
+								}
+								}
+							}
+							else
+							{
+								System.out.println("Wrong number of arguments!");
+							}
 						}
 					}
-					String action = scan.next();
-					
+					else
+					{
+						System.out.println("Wrong number of arguments!");
+					}
+					scan.reset();
 					break;
 				}
 				case "remove":
 				{
-					s = scan.next();
+
 					String action = scan.next();
-					
+
 					break;
 				}
 				case "clear":
 				{
-					s = scan.next();
+
 					String action = scan.next();
-					
+
 					break;
 				}
 				case "edit":
 				{
-					s = scan.next();
+
 					String action = scan.next();
-					
+
 					break;
 				}
 				default:
@@ -133,79 +215,80 @@ public class Main
 					System.out.println("Wrong syntax...");
 					break;
 				}	
+				}
 			}
-		}	
+		}
+	}	
+
+	private static void print_commands()
+	{
+		System.out.println("get - command that reads from Address Book specified records \n"
+				+ "\tSwitches: \n"
+				+ "\t\t * --by-name <name> - returns all records with name <name> \n"
+				+ "\t\t * --by-surname <surname> - returns all records with surname <surname>\n"
+				+ "\t\t * --by-id <id> - returns record with given id value <id>\n"
+				+ "\tExamples:\n"
+				+ "\t\t * get --by-name John\n"
+				+ "\t\t * get --by-surname Smith\n"
+				+ "\t\t * get --by-id 2\n"
+				+ "\t\t * get --all\n");
+
+		System.out.println("add - command that add new record do Address Book with given values.\n"
+				+ "Values of all fiels of record are required\n"
+				+ "\tExamples:\n"
+				+ "\t\t * in> add\n"
+				+ "\t\t * out> Enter name:\n"
+				+ "\t\t * in> John\n"
+				+ "\t\t * out> Enter surname:\n"
+				+ "\t\t * in> Smith\n"
+				+ "\t\t * out> Enter age:\n"
+				+ "\t\t * in> 42\n"
+				+ "\t\t * out> Enter street:\n"
+				+ "\t\t * in> Bedford\n"
+				+ "\t\t * out> Enter building number:\n"
+				+ "\t\t * in> 24\n"
+				+ "\t\t * out> Enter flat number:\n"
+				+ "\t\t * in> 42\n"
+				+ "\t\t * out> Enter city:\n"
+				+ "\t\t * in> New York\n"
+				+ "\t\t * out> Enter post code:\n"
+				+ "\t\t * in> MK42 0AA\n"
+				+ "\t\t * out> Enter phone number:\n"
+				+ "\t\t * in> 123-456-789\n");
+
+		System.out.println("remove -  command that remove record with given id number.\n"
+				+ "\tExamples: remove 2 \n");
+
+		System.out.println("edit - command that edit record with given id number.\n"
+				+ "Values of all fiels of record are required\n"
+				+ "\tExamples:\n"
+				+ "\t\t * in> edit 2\n"
+				+ "\t\t * out> Enter name:\n"
+				+ "\t\t * in> John\n"
+				+ "\t\t * out> Enter surname:\n"
+				+ "\t\t * in> Smith\n"
+				+ "\t\t * out> Enter age:\n"
+				+ "\t\t * in> 42\n"
+				+ "\t\t * out> Enter street:\n"
+				+ "\t\t * in> Bedford\n"
+				+ "\t\t * out> Enter building number:\n"
+				+ "\t\t * in> 24\n"
+				+ "\t\t * out> Enter flat number:\n"
+				+ "\t\t * in> 42\n"
+				+ "\t\t * out> Enter city:\n"
+				+ "\t\t * in> New York\n"
+				+ "\t\t * out> Enter post code:\n"
+				+ "\t\t * in> MK42 0AA\n"
+				+ "\t\t * out> Enter phone number:\n"
+				+ "\t\t * in> 123-456-789\n");
+
+		System.out.println("clear - commands that clears Address Book \n"
+				+ "\tExample: clear\n");
+
 	}
-  
-    private static void print_commands()
-    {
-    	System.out.println("get - command that reads from Address Book specified records \n"
-    			+ "\tSwitches: \n"
-    			+ "\t\t * --by-name <name> - returns all records with name <name> \n"
-    			+ "\t\t * --by-surname <surname> - returns all records with surname <surname>\n"
-    			+ "\t\t * --by-id <id> - returns record with given id value <id>\n"
-    			+ "\tExamples:\n"
-    			+ "\t\t * get --by-name John\n"
-    			+ "\t\t * get --by-surname Smith\n"
-    			+ "\t\t * get --by-id 2\n"
-    			+ "\t\t * get --all\n");
-    	
-    	System.out.println("add - command that add new record do Address Book with given values.\n"
-    			+ "Values of all fiels of record are required\n"
-    			+ "\tExamples:\n"
-    			+ "\t\t * in> add\n"
-    			+ "\t\t * out> Enter name:\n"
-    			+ "\t\t * in> John\n"
-    			+ "\t\t * out> Enter surname:\n"
-    			+ "\t\t * in> Smith\n"
-    			+ "\t\t * out> Enter age:\n"
-    			+ "\t\t * in> 42\n"
-    			+ "\t\t * out> Enter street:\n"
-    			+ "\t\t * in> Bedford\n"
-    			+ "\t\t * out> Enter building number:\n"
-    			+ "\t\t * in> 24\n"
-    			+ "\t\t * out> Enter flat number:\n"
-    			+ "\t\t * in> 42\n"
-    			+ "\t\t * out> Enter city:\n"
-    			+ "\t\t * in> New York\n"
-    			+ "\t\t * out> Enter post code:\n"
-    			+ "\t\t * in> MK42 0AA\n"
-    			+ "\t\t * out> Enter phone number:\n"
-    			+ "\t\t * in> 123-456-789\n");
-    	
-    	System.out.println("remove -  command that remove record with given id number.\n"
-    			+ "\tExamples: remove 2 \n");
-    	
-    	System.out.println("edit - command that edit record with given id number.\n"
-    			+ "Values of all fiels of record are required\n"
-    			+ "\tExamples:\n"
-    			+ "\t\t * in> edit 2\n"
-    			+ "\t\t * out> Enter name:\n"
-    			+ "\t\t * in> John\n"
-    			+ "\t\t * out> Enter surname:\n"
-    			+ "\t\t * in> Smith\n"
-    			+ "\t\t * out> Enter age:\n"
-    			+ "\t\t * in> 42\n"
-    			+ "\t\t * out> Enter street:\n"
-    			+ "\t\t * in> Bedford\n"
-    			+ "\t\t * out> Enter building number:\n"
-    			+ "\t\t * in> 24\n"
-    			+ "\t\t * out> Enter flat number:\n"
-    			+ "\t\t * in> 42\n"
-    			+ "\t\t * out> Enter city:\n"
-    			+ "\t\t * in> New York\n"
-    			+ "\t\t * out> Enter post code:\n"
-    			+ "\t\t * in> MK42 0AA\n"
-    			+ "\t\t * out> Enter phone number:\n"
-    			+ "\t\t * in> 123-456-789\n");
-    	
-    	System.out.println("clear - commands that clears Address Book \n"
-    			+ "\tExample: clear\n");
-    	
-    }
 
 	public Client get_client()
-    {
-    	return this.myClient;
-    }
+	{
+		return this.myClient;
+	}
 }

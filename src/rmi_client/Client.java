@@ -110,7 +110,8 @@ public final class Client
 				msg.setNameProp(value);
 				if ( ifc.searchRecordByName(msg))
 				{
-					for ( BookRecord br : msg.getListOfRecords() )
+					Message respMsg = ifc.getResponse();
+					for ( BookRecord br : respMsg.getListOfRecords() )
 					{
 						listOut.add(utils.convertStructToStringV2(br));
 					}
@@ -123,7 +124,8 @@ public final class Client
 				msg.setSurnameProp(value);
 				if ( ifc.searchRecordBySurname(msg))
 				{
-					for ( BookRecord br : msg.getListOfRecords() )
+					Message respMsg = ifc.getResponse();
+					for ( BookRecord br : respMsg.getListOfRecords() )
 					{
 						listOut.add(utils.convertStructToStringV2(br));
 					}
@@ -136,10 +138,9 @@ public final class Client
 				msg.setRecordId(Integer.decode( value ));
 				if ( ifc.searchRecordById(msg))
 				{
-					for ( BookRecord br : msg.getListOfRecords() )
-					{
-						listOut.add(utils.convertStructToStringV2(br));
-					}
+					Message respMsg = ifc.getResponse();
+					
+					listOut.add(utils.convertStructToStringV2(respMsg.getBookRecord()));
 					return true;
 				}
 				return false;
@@ -148,7 +149,8 @@ public final class Client
 			{
 				if ( ifc.getFullList(msg))
 				{
-					for ( BookRecord br : msg.getListOfRecords() )
+					Message respMsg = ifc.getResponse();
+					for ( BookRecord br : respMsg.getListOfRecords() )
 					{
 						listOut.add(utils.convertStructToStringV2(br));
 					}
@@ -168,12 +170,12 @@ public final class Client
 			return false;
 		}
 	}
-	
+
 	public Boolean editEntry( List< String > values ) throws RemoteException
 	{
 		Message msg = new Message();
 		BookRecord bookRec = new BookRecord();
-		
+
 		if ( 10 == values.size() )
 		{
 			msg.setRecordId(Integer.decode(values.get(0)));
@@ -200,7 +202,7 @@ public final class Client
 			}
 		}
 		return false;
-		
-		
+
+
 	}
 }

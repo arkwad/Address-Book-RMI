@@ -24,4 +24,6 @@ public interface Interface extends Remote
 	Boolean searchRecordById( Message msg ) throws RemoteException;
 	Boolean searchRecordByName( Message msg ) throws RemoteException;
 	Boolean searchRecordBySurname( Message msg ) throws RemoteException;
+	
+	Message getResponse() throws RemoteException;
 }
