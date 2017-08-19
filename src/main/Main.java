@@ -1,5 +1,8 @@
 /**
- * 
+ * @author Arkadiusz Wadowski
+ * @ Software Developer
+ * @ Github: https://github.com/arkwad
+ * @ Contact: wadowski.arkadiusz@gmail.com
  */
 package main;
 
@@ -60,9 +63,10 @@ public class Main
 			argsList.clear();
 
 			String name = reader.readLine();
-			//argsList.add(scan.next());
+
 			String[] args = name.split(" ");
-			if (args.length > 1)
+			
+			if (args.length >= 1)
 			{
 				switch ( args[0] )
 				{
@@ -85,7 +89,7 @@ public class Main
 
 					if (this.get_client().addEntry(argsList))
 					{
-						System.out.println("Entry added sucessfully!");
+						System.out.println("Entry added successfully!");
 					}
 					else
 					{
@@ -106,9 +110,16 @@ public class Main
 						{
 							if ( this.get_client().getSpecifiedList( args[1], "", outputList))
 							{
-								for ( String line : outputList )
+								if ( outputList.isEmpty() )
 								{
-									System.out.print(line);
+									System.out.println("No records found!");
+								}
+								else
+								{
+									for ( String line : outputList )
+									{
+										System.out.print(line);
+									}
 								}
 							}
 							else
@@ -126,9 +137,16 @@ public class Main
 								{
 									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
 									{
-										for ( String line : outputList )
+										if ( outputList.isEmpty() )
 										{
-											System.out.print(line);
+											System.out.println("No records found!");
+										}
+										else
+										{
+											for ( String line : outputList )
+											{
+												System.out.print(line);
+											}
 										}
 									}
 									else
@@ -142,9 +160,16 @@ public class Main
 								{
 									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
 									{
-										for ( String line : outputList )
+										if ( outputList.isEmpty() )
 										{
-											System.out.print(line);
+											System.out.println("No records found!");
+										}
+										else
+										{
+											for ( String line : outputList )
+											{
+												System.out.print(line);
+											}
 										}
 									}
 									else
@@ -157,9 +182,16 @@ public class Main
 								{
 									if ( this.get_client().getSpecifiedList(args[1], args[2], outputList) )
 									{
-										for ( String line : outputList )
+										if ( outputList.isEmpty() )
 										{
-											System.out.print(line);
+											System.out.println("No records found!");
+										}
+										else
+										{
+											for ( String line : outputList )
+											{
+												System.out.print(line);
+											}
 										}
 									}
 									else
@@ -186,18 +218,37 @@ public class Main
 					{
 						System.out.println("Wrong number of arguments!");
 					}
-					scan.reset();
 					break;
 				}
 				case "remove":
 				{
-
-					String action = scan.next();
-
+					if ( 2 == args.length )
+					{
+						if (this.get_client().removeEntry( Integer.decode(args[1]) ) )
+						{
+							System.out.println("Removed successfully!");
+						}
+						else
+						{
+							System.out.println("An error occured during removing record!");
+						}
+					}
+					else
+					{
+						System.out.println("Wrong number of arguments!");
+					}
 					break;
 				}
 				case "clear":
 				{
+					if ( this.get_client().clearAddressBook() )
+					{
+						System.out.println("Address Book cleared successfully!");
+					}
+					else
+					{
+						System.out.println("Error during clearing Address Book!");
+					}
 
 					String action = scan.next();
 
@@ -205,9 +256,43 @@ public class Main
 				}
 				case "edit":
 				{
-
-					String action = scan.next();
-
+					argsList.clear();
+					List<String> outputList = new ArrayList<String>();
+					
+					if ( 2 == args.length )
+					{
+						if ( this.get_client().getSpecifiedList("--by-id", args[1], outputList) )
+						{
+							if ( outputList.isEmpty() )
+							{
+								System.out.println("No such record!");
+							}
+							else
+							{
+								argsList.add(args[1]);
+								for ( String arg : utils.listOfProperties )
+								{
+									if ( !arg.equals( utils.listOfProperties.get(0) ) )
+									{
+										System.out.println("Enter " + arg);
+										argsList.add( scan.next() );	
+									}
+								}
+								if ( this.get_client().editEntry(argsList))
+								{
+									System.out.println("Record edited successfully!");
+								}
+								else
+								{
+									System.out.println("Error during editing!");
+								}
+							}
+						}
+					}
+					else
+					{
+						System.out.println("Wrong number of arguments!");
+					}
 					break;
 				}
 				default:

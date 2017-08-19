@@ -1,11 +1,13 @@
 /**
- * 
+ * @author Arkadiusz Wadowski
+ * @ Software Developer
+ * @ Github: https://github.com/arkwad
+ * @ Contact: wadowski.arkadiusz@gmail.com
  */
 package utils;
 
 import java.util.Arrays;
 import java.util.List;
-
 import message.BookRecord;
 
 /**
@@ -47,7 +49,7 @@ public class Utils
 					 +"Flat Number: " + record.flatNumber + ","
 					 +"City: " + record.city + ","
 					 +"Post Code: " + record.postCode + ","
-					 +"Phone Number: " + record.phoneNumber + ",.\n";
+					 +"Phone Number: " + record.phoneNumber + ",.";
 		
 		return temp;
 	}

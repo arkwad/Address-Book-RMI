@@ -1,11 +1,10 @@
 /**
- * 
+ * @author Arkadiusz Wadowski
+ * @ Software Developer
+ * @ Github: https://github.com/arkwad
+ * @ Contact: wadowski.arkadiusz@gmail.com
  */
 package rmi_client;
-/**
- * @author Arek
- *
- */
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -35,11 +34,7 @@ public final class Client
 		this.ifc = (Interface)this.registry.lookup("Server");
 		System.out.println("Client succefully found server!");
 	}
-	public static void main(String[] args) throws Exception, IOException
-	{
-		Client cl = new Client();
-		cl.clearAddressBook();
-	}
+
 	public Boolean clearAddressBook()
 	{
 		try 
@@ -139,7 +134,11 @@ public final class Client
 				if ( ifc.searchRecordById(msg))
 				{
 					Message respMsg = ifc.getResponse();
-					
+					if ( null == respMsg.getBookRecord() )
+					{
+						listOut.clear();
+						return true;
+					}
 					listOut.add(utils.convertStructToStringV2(respMsg.getBookRecord()));
 					return true;
 				}

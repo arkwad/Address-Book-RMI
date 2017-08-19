@@ -1,12 +1,10 @@
 /**
- * 
+ * @author Arkadiusz Wadowski
+ * @ Software Developer
+ * @ Github: https://github.com/arkwad
+ * @ Contact: wadowski.arkadiusz@gmail.com
  */
 package rmi_server;
-
-/**
- * @author Arek
- *
- */
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -88,18 +86,6 @@ public class Server extends UnicastRemoteObject implements Interface
 		System.out.println("Server is ready!");
 	}
 
-	public static void main(String[] args) throws Exception, IOException
-	{
-		Server srv = new Server();
-		Message msg = new Message();
-		BookRecord br = new BookRecord();
-		msg.setBookRecord(br);
-		srv.addRecord(msg);
-		srv.addRecord(msg);
-		srv.addRecord(msg);
-		msg.setSurnameProp("Wadowski");
-		srv.searchRecordBySurname(msg);
-	}
 	/**
 	 * \brief Check if file with data exist in working directory.
 	 *
@@ -112,7 +98,16 @@ public class Server extends UnicastRemoteObject implements Interface
 	{
 		return Files.exists( this.filePath );
 	}
-
+	
+	/**
+	 * @brief Clearing whole Address Book.
+	 *
+	 * @param[in] - void.
+	 *
+	 * @retval true - Cleared successfully.
+	 * @retval false - Something went wrong during clearing file.
+	 * 
+	 */
 	@Override
 	public Boolean clearList() throws RemoteException 
 	{
@@ -127,7 +122,16 @@ public class Server extends UnicastRemoteObject implements Interface
 			return false;
 		}
 	}
-
+	
+	/**
+	 * @brief Adding new record to Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Added successfully.
+	 * @retval false - Something went wrong during adding record.
+	 * 
+	 */
 	@Override
 	public Boolean addRecord(Message msg) throws RemoteException 
 	{
@@ -139,7 +143,7 @@ public class Server extends UnicastRemoteObject implements Interface
 			List<String> lines = Files.readAllLines(this.filePath);
 			if ( lines.isEmpty() )
 			{
-				String str = "Id: 1," + rawStr;
+				String str = "Id: 1," + rawStr + "\r\n";
 				Files.write(filePath, str.getBytes(), StandardOpenOption.APPEND);
 				return true;
 			}
@@ -148,7 +152,7 @@ public class Server extends UnicastRemoteObject implements Interface
 				String lastRecord = lines.get(lines.size() - 1);
 				Integer maxIndex = Integer.decode(lastRecord.substring(4, lastRecord.indexOf(",",0)));
 				maxIndex++;
-				String toWrite = "Id: " + maxIndex.toString()+"," + rawStr;
+				String toWrite = "Id: " + maxIndex.toString()+"," + rawStr + "\r\n";
 				Files.write(filePath, toWrite.getBytes(), StandardOpenOption.APPEND);
 				return true;
 			}
@@ -160,6 +164,15 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Removing record with specified ID from Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Removed successfully.
+	 * @retval false - Something went wrong during removing record.
+	 * 
+	 */
 	@Override
 	public Boolean removeRecord(Message msg) throws RemoteException 
 	{
@@ -186,16 +199,26 @@ public class Server extends UnicastRemoteObject implements Interface
 				return false;
 			}
 			lines.removeAll(linesToRemove);
+			updateIndexesOfRecords(lines);
 			Files.write(this.filePath, lines);
+			return true;
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
+			return false;
 		}
-
-		return null;
 	}
 
+	/**
+	 * @brief Editing existing record in Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Edited successfully.
+	 * @retval false - Something went wrong during editing record i.e. there is no such file.
+	 * 
+	 */
 	@Override
 	public Boolean editRecord(Message msg) throws RemoteException 
 	{
@@ -222,6 +245,15 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Provides list of all record from Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - List returned without problems.
+	 * @retval false - Something went wrong during collecting records from file.
+	 * 
+	 */
 	@Override
 	public Boolean getFullList(Message msg) throws RemoteException 
 	{
@@ -249,6 +281,15 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Returns record with specified ID from Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Record returned without problems.
+	 * @retval false - Something went wrong during getting record from file.
+	 * 
+	 */
 	@Override
 	public Boolean searchRecordById(Message msg) throws RemoteException 
 	{
@@ -256,6 +297,13 @@ public class Server extends UnicastRemoteObject implements Interface
 		try 
 		{
 			List<String> lines = Files.readAllLines(this.filePath);
+			
+			if (indexToSearch > lines.size())
+			{
+				this.respMsg.setBookRecord(null);
+				return true;
+			}
+			
 			indexToSearch--;
 			this.respMsg.setBookRecord(this.utils.convertStringToStruct(lines.get(indexToSearch)));
 			return true;
@@ -267,6 +315,15 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Returns all records with specified Name field from Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Records returned without problems.
+	 * @retval false - Something went wrong during getting records from file.
+	 * 
+	 */
 	@Override
 	public Boolean searchRecordByName(Message msg) throws RemoteException 
 	{
@@ -299,6 +356,15 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Returns all records with specified Surname field from Address Book.
+	 *
+	 * @param[in] - Message object.
+	 *
+	 * @retval true - Records returned without problems.
+	 * @retval false - Something went wrong during getting records from file.
+	 * 
+	 */
 	@Override
 	public Boolean searchRecordBySurname(Message msg) throws RemoteException 
 	{
@@ -331,9 +397,37 @@ public class Server extends UnicastRemoteObject implements Interface
 		}
 	}
 
+	/**
+	 * @brief Returns Message object which shall contains result of last proceed operation.
+	 *
+	 * @param[in] - void.
+	 *
+	 * @retval Message object.
+	 * 
+	 */
 	@Override
 	public Message getResponse() throws RemoteException 
 	{
 		return this.respMsg;
+	}
+	/**
+	 * @brief Internal method that updates ID's of records after remove one from the middle.
+	 *
+	 * @param[in] - Current list of records with wrong ID's sequence.
+	 *
+	 * @retval void
+	 * 
+	 */
+	private void updateIndexesOfRecords ( List<String> lines )
+	{
+		Integer idx = 1;
+		for (String line : lines)
+		{
+			int pos = line.indexOf("Name");
+			line = line.substring(pos, line.length());
+			line = "Id: " + idx.toString() +","+ line;
+			lines.set(idx - 1, line);
+			idx ++;
+		}
 	}
 }

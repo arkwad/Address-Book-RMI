@@ -1,12 +1,10 @@
 /**
- * 
+ * @author Arkadiusz Wadowski
+ * @ Software Developer
+ * @ Github: https://github.com/arkwad
+ * @ Contact: wadowski.arkadiusz@gmail.com
  */
 package rmi_interface;
-
-/**
- * @author Arek
- *
- */
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
